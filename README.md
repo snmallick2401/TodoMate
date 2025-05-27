@@ -1,25 +1,16 @@
-# TodoMate 📝🌗
+# 📝 TodoMate
 
-**TodoMate** is a simple yet elegant Todo List web app built with pure HTML, CSS, and JavaScript. It features a clean UI, a responsive design, and supports both dark and light themes. Perfect for organizing your daily tasks with style.
+**TodoMate** is a simple and beautiful Todo App built with **Tailwind CSS** and **vanilla JavaScript**. It helps you manage your tasks efficiently with features like dark/light mode, task priority levels, and category tagging.  
+Created with care by **S. N. Mallick**.
 
-## 🔥 Features
+---
 
-- ✅ Add, edit, mark as done, and delete todo items
-- 🌙 Light and Dark theme toggle with persistent mode
-- 📱 Fully responsive on all devices
-- ❤️ Built with love by [S. N. Mallick](#)
+## 🌟 Features
 
-## 🚀 Live Demo
-
-Check it out here: [Live Demo Link](#) *(Replace with your GitHub Pages or Netlify link)*
-
-## 📸 Preview
-
-![TodoMate Screenshot](screenshot.png) *(Add a screenshot after deployment)*
-
-## 🛠️ Tech Stack
-
-- HTML5
-- CSS3 (Custom properties + responsive layout)
-- JavaScript (DOM manipulation)
-
+- ✅ Add, edit, delete, and mark tasks as completed
+- 🌗 Dark mode / Light mode toggle (with local storage persistence)
+- 📌 Task priority levels: Low, Medium, High
+- 🏷️ Task categories: General, Work, Personal, Study
+- 💾 Persistent data using Local Storage
+- 📱 Fully responsive design
+- ♿ Keyboard and screen-reader accessible
