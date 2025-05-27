@@ -1,263 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo App by S. N. Mallick</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400&display=swap">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TodoMate - by S. N. Mallick</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://kit.fontawesome.com/d5f22ee4f8.js" crossorigin="anonymous"></script>
+
+  <!-- Custom Theme Styling -->
   <style>
-    :root {
-      --bg-color: #e55c8a;
-      --card-bg: #3c424a;
-      --text-color: white;
-      --input-bg: rgba(0, 0, 0, 0.3);
-      --button-bg: #e55c8a;
-      --icon-color: #e55c8a;
-    }
-
-    body.light {
-      --bg-color: #f2f2f2;
-      --card-bg: #ffffff;
-      --text-color: #333;
-      --input-bg: #e0e0e0;
-      --button-bg: #1976d2;
-      --icon-color: #1976d2;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
     body {
-      background: var(--bg-color);
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
+      background-color: #fbcfe8;
+      color: #1f2937;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      width: 100vw;
-      height: 100vh;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+    body.dark-mode {
+      background-color: #1f2937;
+      color: #f0f0f0;
     }
 
-    .ta-wrapper {
-      background: var(--card-bg);
-      color: var(--text-color);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 7px 7px rgb(0 0 0 / 20%);
-      min-height: 300px;
-      width: 600px;
+    .dark-mode .bg-white {
+      background-color: #374151;
     }
 
-    .heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+    .dark-mode .text-gray-600,
+    .dark-mode .text-gray-700 {
+      color: #d1d5db;
     }
 
-    .heading h1 {
-      font-size: 36px;
+    .dark-mode .border {
+      border-color: #4b5563;
     }
 
-    .theme-toggle {
-      cursor: pointer;
-      font-size: 20px;
-    }
-
-    .input-wrapper {
-      margin-bottom: 20px;
-    }
-
-    .input-wrapper input {
-      outline: none;
-      border: 0;
-      background: var(--input-bg);
-      padding: 10px;
-      color: var(--text-color);
-      width: 70%;
-    }
-
-    .input-wrapper button {
-      background: var(--button-bg);
-      color: white;
-      border: 0;
-      padding: 10px;
-      font-weight: bold;
-      border-radius: 2px;
-      cursor: pointer;
-    }
-
-    .todo-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-      padding-bottom: 10px;
-    }
-
-    .todo-item input {
-      background: transparent;
-      border: none;
-      color: var(--text-color);
-      outline: none;
-    }
-
-    .todo-item i {
-      color: var(--icon-color);
-      background: transparent;
-      border: 1px solid;
-      border-radius: 50%;
-      padding: 6px;
-      cursor: pointer;
-      transition: 0.2s ease-in-out;
-      margin-left: 5px;
-    }
-
-    .done {
-      text-decoration: line-through;
-    }
-
-    .fa-x {
-      padding: 6px 8px !important;
-    }
-
-    footer {
-      margin-top: 20px;
-      font-size: 14px;
-      color: var(--text-color);
-    }
-
-    @media (max-width: 650px) {
-      .ta-wrapper {
-        width: 90%;
-      }
-
-      .input-wrapper input {
-        width: 60%;
-      }
-    }
+    .fa-sun { display: none; }
+    .dark-mode .fa-moon { display: none; }
+    .dark-mode .fa-sun { display: inline; }
   </style>
 </head>
 
 <body>
-  <div class="main-container">
-    <div class="ta-container">
-      <div class="ta-wrapper">
-        <div class="heading">
-          <h1>Todo App</h1>
-          <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
-            <i class="fa-solid fa-moon"></i>
-          </div>
+  <main class="min-h-screen flex flex-col items-center justify-start pt-10 px-4">
+    <section class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
+      <!-- Header -->
+      <header class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl font-bold text-gray-800">TodoMate 📝</h1>
+        <button id="theme-toggle" class="text-2xl" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+          <i class="fa-solid fa-sun"></i>
+        </button>
+      </header>
+
+      <!-- Input Form -->
+      <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          type="text"
+          id="todo-input"
+          placeholder="Enter your task..."
+          class="px-4 py-2 border rounded w-full text-gray-800 dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+        />
+        <div class="flex gap-2">
+          <select id="priority" class="px-2 py-2 rounded dark:bg-gray-800 dark:text-white dark:border-gray-600">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+          <select id="category" class="px-2 py-2 rounded dark:bg-gray-800 dark:text-white dark:border-gray-600">
+            <option value="general">General</option>
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="study">Study</option>
+          </select>
+          <button id="submit" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded">
+            Add
+          </button>
         </div>
-        <div class="input-wrapper">
-          <input type="text" id="todo-input" placeholder="Enter a task">
-          <button id="submit">Add</button>
-        </div>
-        <div class="todo-lists"></div>
       </div>
-    </div>
-    <footer>Made with ❤️ by <strong>S. N. Mallick</strong></footer>
-  </div>
 
+      <!-- Task Summary & Clear Completed -->
+      <div class="flex justify-between items-center mb-4">
+        <p id="task-counter" class="text-sm text-gray-600 dark:text-gray-200"></p>
+        <button id="clear-completed" class="text-sm text-red-500 hover:text-red-600 hidden">
+          Clear Completed
+        </button>
+      </div>
+
+      <!-- Task List -->
+      <section id="todo-lists" class="space-y-4" role="list"></section>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-4 text-sm text-gray-700 dark:text-gray-300">
+      Made by <strong>S. N. Mallick</strong>
+    </footer>
+  </main>
+
+  <!-- JavaScript Logic -->
   <script>
-    const input = document.querySelector('#todo-input');
-    const toggleBtn = document.getElementById("theme-toggle");
-    const icon = toggleBtn.querySelector("i");
+    const body = document.body;
+    const themeToggle = document.getElementById("theme-toggle");
 
-    function setTheme(mode) {
-      if (mode === "light") {
-        document.body.classList.add("light");
-        icon.classList.replace("fa-moon", "fa-sun");
-      } else {
-        document.body.classList.remove("light");
-        icon.classList.replace("fa-sun", "fa-moon");
-      }
-      localStorage.setItem("theme", mode);
+    function setTheme(theme) {
+      body.classList.toggle("dark-mode", theme === "dark");
+      localStorage.setItem("theme", theme);
     }
 
-    toggleBtn.addEventListener("click", () => {
-      const currentTheme = document.body.classList.contains("light") ? "dark" : "light";
-      setTheme(currentTheme);
-    });
-
-    // Set theme on page load
-    const savedTheme = localStorage.getItem("theme") || "dark";
+    const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
 
-    document.querySelector('#submit').addEventListener('click', () => {
-      const inputData = input.value.trim();
-      if (!inputData) return;
-
-      input.value = "";
-
-      const todo_el = document.createElement('div');
-      todo_el.classList.add('todo-item');
-
-      const todo_content_el = document.createElement('div');
-      todo_el.appendChild(todo_content_el);
-
-      const todo_input_el = document.createElement('input');
-      todo_input_el.classList.add('text');
-      todo_input_el.type = 'text';
-      todo_input_el.value = inputData;
-      todo_input_el.setAttribute('readonly', 'readonly');
-      todo_content_el.appendChild(todo_input_el);
-
-      const todo_actions_el = document.createElement('div');
-      todo_actions_el.classList.add('action-items');
-
-      const todo_done_el = document.createElement('i');
-      todo_done_el.classList.add('fa-solid', 'fa-check');
-
-      const todo_edit_el = document.createElement('i');
-      todo_edit_el.classList.add('fa-solid', 'fa-pen-to-square', 'edit');
-
-      const todo_delete_el = document.createElement('i');
-      todo_delete_el.classList.add('fa-solid', 'fa-trash');
-
-      todo_actions_el.appendChild(todo_done_el);
-      todo_actions_el.appendChild(todo_edit_el);
-      todo_actions_el.appendChild(todo_delete_el);
-
-      todo_el.appendChild(todo_actions_el);
-      document.querySelector('.todo-lists').appendChild(todo_el);
-
-      todo_done_el.addEventListener('click', () => {
-        todo_input_el.classList.add('done');
-        todo_el.removeChild(todo_actions_el);
-      });
-
-      todo_edit_el.addEventListener('click', () => {
-        if (todo_edit_el.classList.contains("edit")) {
-          todo_edit_el.classList.remove("edit", "fa-pen-to-square");
-          todo_edit_el.classList.add("fa-x", "save");
-          todo_input_el.removeAttribute("readonly");
-          todo_input_el.focus();
-        } else {
-          todo_edit_el.classList.remove("save", "fa-x");
-          todo_edit_el.classList.add("fa-pen-to-square", "edit");
-          todo_input_el.setAttribute("readonly", "readonly");
-        }
-      });
-
-      todo_delete_el.addEventListener('click', () => {
-        document.querySelector('.todo-lists').removeChild(todo_el);
-      });
+    themeToggle.addEventListener("click", () => {
+      setTheme(body.classList.contains("dark-mode") ? "light" : "dark");
     });
+
+    const input = document.getElementById("todo-input");
+    const todoLists = document.getElementById("todo-lists");
+    const prioritySelect = document.getElementById("priority");
+    const categorySelect = document.getElementById("category");
+    const taskCounter = document.getElementById("task-counter");
+    const clearCompletedBtn = document.getElementById("clear-completed");
+
+    function updateTaskCounter() {
+      const total = todoLists.querySelectorAll(".todo-item").length;
+      const completed = todoLists.querySelectorAll(".todo-item.line-through").length;
+      taskCounter.textContent = `${completed} of ${total} tasks completed`;
+      clearCompletedBtn.classList.toggle("hidden", total === 0 || completed === 0);
+    }
+
+    function saveTasks() {
+      const tasks = [...todoLists.querySelectorAll(".todo-item")].map(el => ({
+        text: el.querySelector("input").value,
+        priority: el.dataset.priority,
+        category: el.dataset.category,
+        done: el.querySelector("input").classList.contains("line-through")
+      }));
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      tasks.forEach(task => addTask(task.text, task.priority, task.category, task.done));
+      updateTaskCounter();
+    }
+
+    function addTask(text, priority, category, done = false) {
+      const todoEl = document.createElement("div");
+      todoEl.className = "todo-item flex justify-between items-start border p-4 rounded-lg shadow";
+      todoEl.dataset.priority = priority;
+      todoEl.dataset.category = category;
+
+      const left = document.createElement("div");
+
+      const taskText = document.createElement("input");
+      taskText.value = text;
+      taskText.readOnly = true;
+      taskText.className = `bg-transparent font-medium text-lg outline-none w-full text-gray-800 dark:text-white ${done ? "line-through" : ""}`;
+
+      const tags = document.createElement("p");
+      tags.className = "text-sm text-gray-500 mt-1 dark:text-gray-300";
+      tags.textContent = `Priority: ${priority}, Category: ${category}`;
+
+      left.appendChild(taskText);
+      left.appendChild(tags);
+
+      const actions = document.createElement("div");
+      actions.className = "flex gap-2 mt-1 md:mt-0";
+
+      const doneBtn = document.createElement("i");
+      doneBtn.className = `fa-solid fa-check text-green-600 cursor-pointer ${done ? "hidden" : ""}`;
+      const editBtn = document.createElement("i");
+      editBtn.className = "fa-solid fa-pen-to-square text-blue-500 cursor-pointer";
+      const delBtn = document.createElement("i");
+      delBtn.className = "fa-solid fa-trash text-red-500 cursor-pointer";
+
+      doneBtn.onclick = () => {
+        taskText.classList.add("line-through");
+        todoEl.classList.add("line-through");
+        doneBtn.classList.add("hidden");
+        saveTasks();
+        updateTaskCounter();
+      };
+
+      editBtn.onclick = () => {
+        taskText.readOnly = !taskText.readOnly;
+        editBtn.classList.toggle("fa-save");
+        editBtn.classList.toggle("fa-pen-to-square");
+        if (taskText.readOnly) saveTasks();
+        else taskText.focus();
+      };
+
+      delBtn.onclick = () => {
+        todoEl.remove();
+        saveTasks();
+        updateTaskCounter();
+      };
+
+      actions.append(doneBtn, editBtn, delBtn);
+      todoEl.append(left, actions);
+      todoLists.appendChild(todoEl);
+
+      saveTasks();
+      updateTaskCounter();
+    }
+
+    document.getElementById("submit").addEventListener("click", () => {
+      const text = input.value.trim();
+      if (!text) return;
+      addTask(text, prioritySelect.value, categorySelect.value);
+      input.value = "";
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("submit").click();
+      if (e.key === "Escape") input.value = "";
+    });
+
+    clearCompletedBtn.addEventListener("click", () => {
+      [...todoLists.querySelectorAll(".todo-item.line-through")].forEach(el => el.remove());
+      saveTasks();
+      updateTaskCounter();
+    });
+
+    window.addEventListener("load", loadTasks);
   </script>
 </body>
-
 </html>
