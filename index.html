@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App by S. N. Mallick</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400&display=swap">
+  <script src="https://kit.fontawesome.com/d5f22ee4f8.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg-color: #e55c8a;
+      --card-bg: #3c424a;
+      --text-color: white;
+      --input-bg: rgba(0, 0, 0, 0.3);
+      --button-bg: #e55c8a;
+      --icon-color: #e55c8a;
+    }
+
+    body.light {
+      --bg-color: #f2f2f2;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --input-bg: #e0e0e0;
+      --button-bg: #1976d2;
+      --icon-color: #1976d2;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .ta-wrapper {
+      background: var(--card-bg);
+      color: var(--text-color);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 7px 7px rgb(0 0 0 / 20%);
+      min-height: 300px;
+      width: 600px;
+    }
+
+    .heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .heading h1 {
+      font-size: 36px;
+    }
+
+    .theme-toggle {
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .input-wrapper {
+      margin-bottom: 20px;
+    }
+
+    .input-wrapper input {
+      outline: none;
+      border: 0;
+      background: var(--input-bg);
+      padding: 10px;
+      color: var(--text-color);
+      width: 70%;
+    }
+
+    .input-wrapper button {
+      background: var(--button-bg);
+      color: white;
+      border: 0;
+      padding: 10px;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .todo-item input {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      outline: none;
+    }
+
+    .todo-item i {
+      color: var(--icon-color);
+      background: transparent;
+      border: 1px solid;
+      border-radius: 50%;
+      padding: 6px;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+      margin-left: 5px;
+    }
+
+    .done {
+      text-decoration: line-through;
+    }
+
+    .fa-x {
+      padding: 6px 8px !important;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-color);
+    }
+
+    @media (max-width: 650px) {
+      .ta-wrapper {
+        width: 90%;
+      }
+
+      .input-wrapper input {
+        width: 60%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <div class="ta-container">
+      <div class="ta-wrapper">
+        <div class="heading">
+          <h1>Todo App</h1>
+          <div class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" id="todo-input" placeholder="Enter a task">
+          <button id="submit">Add</button>
+        </div>
+        <div class="todo-lists"></div>
+      </div>
+    </div>
+    <footer>Made with ❤️ by <strong>S. N. Mallick</strong></footer>
+  </div>
+
+  <script>
+    const input = document.querySelector('#todo-input');
+    const toggleBtn = document.getElementById("theme-toggle");
+    const icon = toggleBtn.querySelector("i");
+
+    function setTheme(mode) {
+      if (mode === "light") {
+        document.body.classList.add("light");
+        icon.classList.replace("fa-moon", "fa-sun");
+      } else {
+        document.body.classList.remove("light");
+        icon.classList.replace("fa-sun", "fa-moon");
+      }
+      localStorage.setItem("theme", mode);
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const currentTheme = document.body.classList.contains("light") ? "dark" : "light";
+      setTheme(currentTheme);
+    });
+
+    // Set theme on page load
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+
+    document.querySelector('#submit').addEventListener('click', () => {
+      const inputData = input.value.trim();
+      if (!inputData) return;
+
+      input.value = "";
+
+      const todo_el = document.createElement('div');
+      todo_el.classList.add('todo-item');
+
+      const todo_content_el = document.createElement('div');
+      todo_el.appendChild(todo_content_el);
+
+      const todo_input_el = document.createElement('input');
+      todo_input_el.classList.add('text');
+      todo_input_el.type = 'text';
+      todo_input_el.value = inputData;
+      todo_input_el.setAttribute('readonly', 'readonly');
+      todo_content_el.appendChild(todo_input_el);
+
+      const todo_actions_el = document.createElement('div');
+      todo_actions_el.classList.add('action-items');
+
+      const todo_done_el = document.createElement('i');
+      todo_done_el.classList.add('fa-solid', 'fa-check');
+
+      const todo_edit_el = document.createElement('i');
+      todo_edit_el.classList.add('fa-solid', 'fa-pen-to-square', 'edit');
+
+      const todo_delete_el = document.createElement('i');
+      todo_delete_el.classList.add('fa-solid', 'fa-trash');
+
+      todo_actions_el.appendChild(todo_done_el);
+      todo_actions_el.appendChild(todo_edit_el);
+      todo_actions_el.appendChild(todo_delete_el);
+
+      todo_el.appendChild(todo_actions_el);
+      document.querySelector('.todo-lists').appendChild(todo_el);
+
+      todo_done_el.addEventListener('click', () => {
+        todo_input_el.classList.add('done');
+        todo_el.removeChild(todo_actions_el);
+      });
+
+      todo_edit_el.addEventListener('click', () => {
+        if (todo_edit_el.classList.contains("edit")) {
+          todo_edit_el.classList.remove("edit", "fa-pen-to-square");
+          todo_edit_el.classList.add("fa-x", "save");
+          todo_input_el.removeAttribute("readonly");
+          todo_input_el.focus();
+        } else {
+          todo_edit_el.classList.remove("save", "fa-x");
+          todo_edit_el.classList.add("fa-pen-to-square", "edit");
+          todo_input_el.setAttribute("readonly", "readonly");
+        }
+      });
+
+      todo_delete_el.addEventListener('click', () => {
+        document.querySelector('.todo-lists').removeChild(todo_el);
+      });
+    });
+  </script>
+</body>
+
+</html>
