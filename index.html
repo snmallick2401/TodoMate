@@ -1,200 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TodoMate - by S. N. Mallick</title>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CDN (for utility classes) and Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://kit.fontawesome.com/d5f22ee4f8.js" crossorigin="anonymous"></script>
 
-  <!-- Custom Theme Styling -->
   <style>
-    body {
-      background-color: #fbcfe8;
-      color: #1f2937;
-      transition: background-color 0.3s, color 0.3s;
+    /* -------------------------
+       Theme-aware base colors
+       ------------------------- */
+    :root {
+      --bg: #fefefe;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --accent: #ec4899; /* pink-500 */
     }
 
-    body.dark-mode {
-      background-color: #1f2937;
-      color: #f0f0f0;
+    html.dark {
+      --bg: #0f1720;
+      --text: #f8fafc;
+      --muted: #9ca3af;
+      --card: #374151; /* slate-700 */
+      --border: #4b5563;
+      --accent: #f472b6; /* pink-400 for contrast in dark */
     }
 
-    .dark-mode .bg-white {
-      background-color: #374151;
+    html, body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      transition: background-color .20s ease, color .20s ease;
     }
 
-    .dark-mode .text-gray-600,
-    .dark-mode .text-gray-700 {
-      color: #d1d5db;
+    /* container card */
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      transition: background-color .20s ease, border-color .20s ease;
     }
 
-    .dark-mode .border {
-      border-color: #4b5563;
+    /* form elements (selects, inputs) */
+    input[type="text"],
+    select {
+      background-color: transparent; /* so parent card color shows through */
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: border-color .15s ease, background-color .15s ease, color .15s ease;
     }
 
-    .fa-sun { display: none; }
-    .dark-mode .fa-moon { display: none; }
-    .dark-mode .fa-sun { display: inline; }
+    /* placeholder */
+    input::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+
+    /* todo item card */
+    .todo-item {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: background-color .20s ease, border-color .20s ease, color .20s ease;
+    }
+
+    /* main task text input that appears inside each todo item */
+    .task-text {
+      color: var(--text);
+      background: transparent;
+      caret-color: var(--text);
+      border: none;
+    }
+
+    /* tags (priority/category) — critical: visible in both themes */
+    .tags {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    /* small icon buttons */
+    .icon-btn { font-size: 1rem; }
+    .icon-btn[role="button"] { cursor: pointer; }
+
+    /* focus ring for accessibility */
+    .focus-ring:focus {
+      outline: 3px solid rgba(236,72,153,0.16);
+      outline-offset: 2px;
+      border-radius: 0.375rem;
+    }
+
+    /* hide/show theme icons */
+    .icon-hidden { display: none; }
+
+    /* small utility */
+    .muted { color: var(--muted); }
   </style>
 </head>
-
 <body>
   <main class="min-h-screen flex flex-col items-center justify-start pt-10 px-4">
-    <section class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
-      <!-- Header -->
+    <section class="w-full max-w-2xl card rounded-lg shadow-lg p-6">
       <header class="flex items-center justify-between mb-4">
-        <h1 class="text-3xl font-bold text-gray-800">TodoMate 📝</h1>
-        <button id="theme-toggle" class="text-2xl" aria-label="Toggle theme">
-          <i class="fa-solid fa-moon"></i>
-          <i class="fa-solid fa-sun"></i>
+        <h1 class="text-3xl font-bold">TodoMate 📝</h1>
+        <button id="theme-toggle" class="text-2xl p-2 rounded focus-ring" aria-label="Toggle theme" title="Toggle theme">
+          <i id="icon-moon" class="fa-solid fa-moon"></i>
+          <i id="icon-sun" class="fa-solid fa-sun icon-hidden"></i>
         </button>
       </header>
 
-      <!-- Input Form -->
       <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
           id="todo-input"
           placeholder="Enter your task..."
-          class="px-4 py-2 border rounded w-full text-gray-800 dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+          class="px-4 py-2 rounded w-full focus:ring-2 focus:ring-pink-400 focus:outline-none focus-ring"
+          aria-label="New task"
         />
-        <div class="flex gap-2">
-          <select id="priority" class="px-2 py-2 rounded dark:bg-gray-800 dark:text-white dark:border-gray-600">
+
+        <div class="flex gap-2 items-center">
+          <label for="priority" class="sr-only">Priority</label>
+          <select id="priority" class="px-3 py-2 rounded focus-ring" aria-label="Select priority">
             <option value="low">Low</option>
             <option value="medium" selected>Medium</option>
             <option value="high">High</option>
           </select>
-          <select id="category" class="px-2 py-2 rounded dark:bg-gray-800 dark:text-white dark:border-gray-600">
+
+          <label for="category" class="sr-only">Category</label>
+          <select id="category" class="px-3 py-2 rounded focus-ring" aria-label="Select category">
             <option value="general">General</option>
             <option value="work">Work</option>
             <option value="personal">Personal</option>
             <option value="study">Study</option>
           </select>
-          <button id="submit" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded">
+
+          <button id="submit" class="ml-auto bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded focus-ring" aria-label="Add task">
             Add
           </button>
         </div>
       </div>
 
-      <!-- Task Summary & Clear Completed -->
       <div class="flex justify-between items-center mb-4">
-        <p id="task-counter" class="text-sm text-gray-600 dark:text-gray-200"></p>
-        <button id="clear-completed" class="text-sm text-red-500 hover:text-red-600 hidden">
+        <p id="task-counter" class="text-sm muted"></p>
+        <button id="clear-completed" class="text-sm text-red-500 hover:text-red-600 hidden focus-ring" aria-hidden="true">
           Clear Completed
         </button>
       </div>
 
-      <!-- Task List -->
-      <section id="todo-lists" class="space-y-4" role="list"></section>
+      <section id="todo-lists" class="space-y-4" role="list" aria-label="Task list"></section>
     </section>
 
-    <!-- Footer -->
-    <footer class="mt-4 text-sm text-gray-700 dark:text-gray-300">
+    <footer class="mt-4 text-sm muted">
       Made by <strong>S. N. Mallick</strong>
     </footer>
   </main>
 
-  <!-- JavaScript Logic -->
   <script>
-    const body = document.body;
-    const themeToggle = document.getElementById("theme-toggle");
+    // Theme handling: reads/writes localStorage and toggles html.dark
+    const root = document.documentElement;
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const iconMoon = document.getElementById('icon-moon');
+    const iconSun = document.getElementById('icon-sun');
 
-    function setTheme(theme) {
-      body.classList.toggle("dark-mode", theme === "dark");
-      localStorage.setItem("theme", theme);
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        root.classList.add('dark');
+        iconMoon.classList.add('icon-hidden');
+        iconSun.classList.remove('icon-hidden');
+      } else {
+        root.classList.remove('dark');
+        iconSun.classList.add('icon-hidden');
+        iconMoon.classList.remove('icon-hidden');
+      }
+      localStorage.setItem('theme', theme);
     }
 
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
+    // initialize
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
 
-    themeToggle.addEventListener("click", () => {
-      setTheme(body.classList.contains("dark-mode") ? "light" : "dark");
+    themeToggleBtn.addEventListener('click', () => {
+      applyTheme(root.classList.contains('dark') ? 'light' : 'dark');
+      // ensure dynamically created elements reflect new colors through CSS variables
     });
 
-    const input = document.getElementById("todo-input");
-    const todoLists = document.getElementById("todo-lists");
-    const prioritySelect = document.getElementById("priority");
-    const categorySelect = document.getElementById("category");
-    const taskCounter = document.getElementById("task-counter");
-    const clearCompletedBtn = document.getElementById("clear-completed");
+    // Elements
+    const input = document.getElementById('todo-input');
+    const todoLists = document.getElementById('todo-lists');
+    const prioritySelect = document.getElementById('priority');
+    const categorySelect = document.getElementById('category');
+    const taskCounter = document.getElementById('task-counter');
+    const clearCompletedBtn = document.getElementById('clear-completed');
 
+    // Helpers
     function updateTaskCounter() {
-      const total = todoLists.querySelectorAll(".todo-item").length;
-      const completed = todoLists.querySelectorAll(".todo-item.line-through").length;
+      const total = todoLists.querySelectorAll('.todo-item').length;
+      const completed = todoLists.querySelectorAll('.todo-item.line-through').length;
       taskCounter.textContent = `${completed} of ${total} tasks completed`;
-      clearCompletedBtn.classList.toggle("hidden", total === 0 || completed === 0);
+      clearCompletedBtn.classList.toggle('hidden', total === 0 || completed === 0);
+      clearCompletedBtn.setAttribute('aria-hidden', total === 0 || completed === 0);
     }
 
     function saveTasks() {
-      const tasks = [...todoLists.querySelectorAll(".todo-item")].map(el => ({
-        text: el.querySelector("input").value,
+      const tasks = [...todoLists.querySelectorAll('.todo-item')].map(el => ({
+        text: el.querySelector('.task-text').value,
         priority: el.dataset.priority,
         category: el.dataset.category,
-        done: el.querySelector("input").classList.contains("line-through")
+        done: el.classList.contains('line-through')
       }));
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+      localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
     function loadTasks() {
-      const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-      tasks.forEach(task => addTask(task.text, task.priority, task.category, task.done));
+      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      tasks.forEach(t => addTask(t.text, t.priority, t.category, t.done));
       updateTaskCounter();
     }
 
-    function addTask(text, priority, category, done = false) {
-      const todoEl = document.createElement("div");
-      todoEl.className = "todo-item flex justify-between items-start border p-4 rounded-lg shadow";
+    // Create a task element
+    function addTask(text = '', priority = 'medium', category = 'general', done = false) {
+      const todoEl = document.createElement('div');
+      todoEl.className = 'todo-item flex justify-between items-start p-4 rounded-lg shadow';
       todoEl.dataset.priority = priority;
       todoEl.dataset.category = category;
 
-      const left = document.createElement("div");
+      // left part (text and tags)
+      const left = document.createElement('div');
+      left.className = 'w-full pr-4';
 
-      const taskText = document.createElement("input");
+      const taskText = document.createElement('input');
+      taskText.type = 'text';
       taskText.value = text;
       taskText.readOnly = true;
-      taskText.className = `bg-transparent font-medium text-lg outline-none w-full text-gray-800 dark:text-white ${done ? "line-through" : ""}`;
+      taskText.className = 'task-text bg-transparent font-medium text-lg outline-none w-full';
+      taskText.setAttribute('aria-label', 'Task text');
 
-      const tags = document.createElement("p");
-      tags.className = "text-sm text-gray-500 mt-1 dark:text-gray-300";
-      tags.textContent = `Priority: ${priority}, Category: ${category}`;
+      if (done) {
+        taskText.classList.add('line-through');
+        todoEl.classList.add('line-through');
+      }
+
+      const tags = document.createElement('p');
+      tags.className = 'tags';
+      tags.textContent = `Priority: ${capitalize(priority)} • Category: ${capitalize(category)}`;
 
       left.appendChild(taskText);
       left.appendChild(tags);
 
-      const actions = document.createElement("div");
-      actions.className = "flex gap-2 mt-1 md:mt-0";
+      // actions
+      const actions = document.createElement('div');
+      actions.className = 'flex gap-3 items-center mt-1 md:mt-0';
 
-      const doneBtn = document.createElement("i");
-      doneBtn.className = `fa-solid fa-check text-green-600 cursor-pointer ${done ? "hidden" : ""}`;
-      const editBtn = document.createElement("i");
-      editBtn.className = "fa-solid fa-pen-to-square text-blue-500 cursor-pointer";
-      const delBtn = document.createElement("i");
-      delBtn.className = "fa-solid fa-trash text-red-500 cursor-pointer";
+      const doneBtn = document.createElement('i');
+      doneBtn.className = 'fa-solid fa-check icon-btn text-green-600';
+      doneBtn.setAttribute('role', 'button');
+      doneBtn.setAttribute('tabindex', '0');
+      doneBtn.setAttribute('title', 'Mark done');
 
-      doneBtn.onclick = () => {
-        taskText.classList.add("line-through");
-        todoEl.classList.add("line-through");
-        doneBtn.classList.add("hidden");
+      const editBtn = document.createElement('i');
+      editBtn.className = 'fa-solid fa-pen-to-square icon-btn text-blue-500';
+      editBtn.setAttribute('role', 'button');
+      editBtn.setAttribute('tabindex', '0');
+      editBtn.setAttribute('title', 'Edit');
+
+      const delBtn = document.createElement('i');
+      delBtn.className = 'fa-solid fa-trash icon-btn text-red-500';
+      delBtn.setAttribute('role', 'button');
+      delBtn.setAttribute('tabindex', '0');
+      delBtn.setAttribute('title', 'Delete');
+
+      // event handlers
+      doneBtn.addEventListener('click', () => {
+        taskText.classList.add('line-through');
+        todoEl.classList.add('line-through');
+        doneBtn.classList.add('icon-hidden');
         saveTasks();
         updateTaskCounter();
-      };
+      });
+      doneBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') doneBtn.click(); });
 
-      editBtn.onclick = () => {
-        taskText.readOnly = !taskText.readOnly;
-        editBtn.classList.toggle("fa-save");
-        editBtn.classList.toggle("fa-pen-to-square");
-        if (taskText.readOnly) saveTasks();
-        else taskText.focus();
-      };
+      editBtn.addEventListener('click', () => {
+        const wasReadOnly = taskText.readOnly;
+        taskText.readOnly = !wasReadOnly;
+        editBtn.classList.toggle('fa-save');
+        editBtn.classList.toggle('fa-pen-to-square');
 
-      delBtn.onclick = () => {
+        if (!taskText.readOnly) {
+          taskText.focus();
+        } else {
+          saveTasks();
+        }
+      });
+      editBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') editBtn.click(); });
+
+      delBtn.addEventListener('click', () => {
         todoEl.remove();
         saveTasks();
         updateTaskCounter();
-      };
+      });
+      delBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') delBtn.click(); });
+
+      // hide done button if already done
+      if (done) doneBtn.classList.add('icon-hidden');
 
       actions.append(doneBtn, editBtn, delBtn);
       todoEl.append(left, actions);
@@ -204,25 +314,33 @@
       updateTaskCounter();
     }
 
-    document.getElementById("submit").addEventListener("click", () => {
+    // utilities
+    function capitalize(s) {
+      if (!s) return '';
+      return s[0].toUpperCase() + s.slice(1);
+    }
+
+    // submit handler
+    document.getElementById('submit').addEventListener('click', () => {
       const text = input.value.trim();
       if (!text) return;
       addTask(text, prioritySelect.value, categorySelect.value);
-      input.value = "";
+      input.value = '';
+      input.focus();
     });
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") document.getElementById("submit").click();
-      if (e.key === "Escape") input.value = "";
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('submit').click();
+      if (e.key === 'Escape') input.value = '';
     });
 
-    clearCompletedBtn.addEventListener("click", () => {
-      [...todoLists.querySelectorAll(".todo-item.line-through")].forEach(el => el.remove());
+    clearCompletedBtn.addEventListener('click', () => {
+      [...todoLists.querySelectorAll('.todo-item.line-through')].forEach(el => el.remove());
       saveTasks();
       updateTaskCounter();
     });
 
-    window.addEventListener("load", loadTasks);
+    window.addEventListener('load', loadTasks);
   </script>
 </body>
 </html>
